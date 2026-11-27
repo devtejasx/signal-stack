@@ -123,7 +123,7 @@ def run_step(cid: int, job: str):
     return back(f"/c/{cid}/runs" if job != "research" else f"/c/{cid}")
 
 
-@app.post("/api/cron/{job}")
+@app.api_route("/api/cron/{job}", methods=["GET", "POST"])
 def cron_trigger(job: str, request: Request):
     """External-scheduler hook. Free hosts idle the process, so an outside cron (GitHub Actions) can wake it and run
     the two automated processes for every configured company. Requires the CRON_TOKEN bearer secret."""
