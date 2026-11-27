@@ -1,0 +1,20 @@
+# Render Blueprint: New > Blueprint > pick this repo. Free plan, no card required.
+# Free-tier limits: the instance sleeps after ~15 min idle (first request takes ~1 min to wake) and the disk is
+# ephemeral, so the app re-seeds the demo database on each deploy (see deploy/start.sh).
+services:
+  - type: web
+    name: signal-stack
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: GROQ_API_KEY        # free key from https://console.groq.com/keys
+        sync: false
+      - key: CRON_TOKEN          # shared secret for the external weekly/monthly trigger
+        generateValue: true
+      - key: LLM_PROVIDER
+        value: auto
+      - key: POLLINATIONS_ENABLED
+        value: "0"
+      - key: SIGNALSTACK_DB
+        value: data/signalstack.db

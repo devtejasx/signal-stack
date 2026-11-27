@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Intelligence Feed</h1>
+<p class="muted">Chronological developments collected from approved sources (duplicates folded into the original as corroboration).</p>
+<form class="panel" method="get">
+<div class="grid g4">
+<div><label>Category</label><select name="category"><option value="">all</option>{% for c in ['customers','competitors','market','internal'] %}<option {{ 'selected' if f.category == c }}>{{ c }}</option>{% endfor %}</select></div>
+<div><label>Competitor</label><select name="competitor"><option value="">all</option>{% for k in comps %}<option value="{{ k.id }}" {{ 'selected' if f.competitor|string == k.id|string }}>{{ k.name }}</option>{% endfor %}</select></div>
+<div><label>Date (last N days)</label><input type="number" name="days" value="{{ f.days }}" min="1"></div>
+<div><label>Min relevance</label><input type="number" step="0.05" name="min_rel" value="{{ f.min_rel }}" min="0" max="1"></div>
+<div><label>Impact</label><select name="impact"><option value="">any</option><option value="medium" {{ 'selected' if f.impact == 'medium' }}>medium+</option><option value="high" {{ 'selected' if f.impact == 'high' }}>high</option></select></div>
+<div><label>Opportunity / threat</label><select name="polarity"><option value="">all</option>{% for c in ['opportunity','threat','neutral'] %}<option {{ 'selected' if f.polarity == c }}>{{ c }}</option>{% endfor %}</select></div>
+<div><label>Verification</label><select name="verification"><option value="">all</option>{% for c in ['primary_source','corroborated','reported','user_generated','internal','unverified'] %}<option {{ 'selected' if f.verification == c }}>{{ c }}</option>{% endfor %}</select></div>
+<div><label>Search</label><input type="text" name="q" value="{{ f.q }}"></div>
+</div>
+<div class="row" style="margin-top:10px"><label><input type="checkbox" name="significant" value="1" {{ 'checked' if f.significant }}> significant only</label>
+<label>Sort <select name="sort" style="width:auto"><option value="date" {{ 'selected' if f.sort == 'date' }}>newest</option><option value="score" {{ 'selected' if f.sort == 'score' }}>importance</option></select></label>
+<button class="btn sm">Filter</button><a class="btn sm ghost" href="/c/{{ company.id }}/feed">Reset</a> <span class="muted small">{{ rows|length }} records</span></div>
+</form>
+<table>
+<tr><th>Date</th><th>Development</th><th>Category</th><th>Rel.</th><th>Impact</th><th>Score</th><th>Verification</th></tr>
+{% for i in rows %}
+<tr><td class="tiny">{{ (i.published_at or i.discovered_at)[:10] }}{% if not i.published_at %}<br><span class="muted">(found)</span>{% endif %}</td>
+<td><a href="/c/{{ company.id }}/items/{{ i.id }}"><b>{{ i.title|trunc(120) }}</b></a>
+<div class="tiny muted">{{ i.publisher }} · via {{ i.source_name|trunc(50) }}{% if i.competitor %} · <b>{{ i.competitor }}</b>{% endif %}{% if i.corroborations %} · corroborated ×{{ i.corroborations }}{% endif %}</div>
+{% set a = i.analysis|loads %}{% if a.interpretation and a.interpretation.why_it_matters %}<div class="small" style="margin-top:3px">💡 {{ a.interpretation.why_it_matters|trunc(200) }}</div>{% endif %}</td>
+<td><span class="chip {{ i.category }}">{{ i.category }}</span><br>{% if i.significant %}<span class="chip ok">significant</span>{% endif %} <span class="chip {{ i.polarity }}">{{ i.polarity or '' }}</span></td>
+<td class="score">{{ i.relevance|pct }}</td><td class="score">{{ i.impact|pct }}</td><td class="score"><b>{{ i.score|pct }}</b></td>
+<td><span class="chip {{ i.verification }}">{{ (i.verification or '').replace('_',' ') }}</span><div class="tiny muted">rel. {{ i.credibility|pct }} · ev. {{ i.evidence_strength|pct }}</div></td></tr>
+{% else %}<tr><td colspan="7" class="muted">No records match.</td></tr>{% endfor %}
+</table>
+{% endblock %}

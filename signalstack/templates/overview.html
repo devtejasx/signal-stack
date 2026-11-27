@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ company.name }} <span class="chip">{{ company.status }}</span></h1>
+<div class="muted"><a href="{{ company.website }}" target="_blank" rel="noopener">{{ company.website }}</a> · {{ profile.industry or '' }}</div>
+{% if profile.summary %}<p>{{ profile.summary }}</p>{% endif %}
+
+{% set iv = stats.interview %}
+<div class="steps">
+  <div class="step {{ 'done' if stats.facts }}"><div class="t">1. Research</div><div class="d">{{ stats.facts }} verified facts · {{ stats.assumptions }} assumptions</div>
+    <form method="post" action="/c/{{ company.id }}/run/research" class="inline"><button class="btn sm ghost">Re-run</button></form></div>
+  <div class="step {{ 'done' if iv.complete }}"><div class="t">2. Founder interview</div><div class="d">{{ iv.core_done or 0 }}/{{ iv.core_total or 10 }} core · {{ iv.followups or 0 }} follow-ups</div>
+    <a class="btn sm ghost" href="/c/{{ company.id }}/interview">Open</a></div>
+  <div class="step {{ 'done' if stats.sources.approved }}"><div class="t">3. Signal Stack</div><div class="d">{{ stats.competitors }} competitors · {{ stats.sources.approved or 0 }} approved / {{ stats.sources.discovered or 0 }} pending sources</div>
+    <form method="post" action="/c/{{ company.id }}/run/discovery" class="inline"><button class="btn sm ghost">{{ 'Rebuild' if stats.sources.approved else 'Build' }}</button></form></div>
+  <div class="step {{ 'done' if stats.records }}"><div class="t">4. Monitoring</div><div class="d">{{ stats.crawls }} crawl runs · {{ stats.records }} records · {{ stats.significant }} significant</div>
+    <form method="post" action="/c/{{ company.id }}/run/monitor" class="inline"><button class="btn sm ghost">Crawl now</button></form></div>
+  <div class="step {{ 'done' if stats.briefs }}"><div class="t">5. Monday Brief</div><div class="d">{{ stats.briefs }} briefs · {{ stats.audits }} audits</div>
+    <form method="post" action="/c/{{ company.id }}/run/manual_brief" class="inline"><button class="btn sm">Generate brief now</button></form></div>
+</div>
+
+<div class="grid g4">
+  <div class="stat"><div class="n">{{ stats.by_cat.customers or 0 }}</div><div class="l">Customer sources</div></div>
+  <div class="stat"><div class="n">{{ stats.by_cat.competitors or 0 }}</div><div class="l">Competitor sources</div></div>
+  <div class="stat"><div class="n">{{ stats.by_cat.market or 0 }}</div><div class="l">Market sources</div></div>
+  <div class="stat"><div class="n">{{ stats.by_cat.internal or 0 }}</div><div class="l">Internal sources</div></div>
+</div>
+
+<div class="grid g2">
+<div class="panel">
+  <h2 style="margin-top:0">Top ranked signals</h2>
+  {% for i in top %}
+  <div style="margin:8px 0"><span class="chip {{ i.category }}">{{ i.category }}</span> <span class="chip {{ i.polarity }}">{{ i.polarity }}</span>
+    <a href="/c/{{ company.id }}/items/{{ i.id }}">{{ i.title|trunc(110) }}</a>
+    <div class="tiny muted">score {{ i.score|pct }} · {{ i.publisher }} · {{ (i.published_at or 'undated')[:10] }}</div></div>
+  {% else %}<p class="muted">No significant signals yet — build the Signal Stack and run a crawl.</p>{% endfor %}
+</div>
+<div class="panel">
+  <h2 style="margin-top:0">Automation</h2>
+  {% if latest %}<p>Latest brief: <a href="/c/{{ company.id }}/briefs/{{ latest.id }}">{{ latest.title }}</a></p>{% endif %}
+  <div class="kv small">
+    <div>Next weekly brief</div><div>{{ next_runs.weekly_brief|dt or '— (enable in Settings)' }}</div>
+    <div>Next monitoring run</div><div>{{ next_runs.monitor|dt or '—' }}</div>
+    <div>Next source-health audit</div><div>{{ next_runs.monthly_audit|dt or '—' }}</div>
+  </div>
+  <form method="post" action="/c/{{ company.id }}/run/monthly_audit" style="margin-top:10px"><button class="btn sm ghost">Run source-health audit now</button></form>
+  <h3>Recent runs</h3>
+  <table class="small">{% for j in jobs %}<tr><td>{{ j.job }}</td><td><span class="chip {{ j.status }}">{{ j.status }}</span></td><td>{{ j.started_at|dt }}</td><td>{{ (j.error or j.progress or '')|trunc(70) }}</td></tr>{% endfor %}</table>
+</div>
+</div>
+{% endblock %}

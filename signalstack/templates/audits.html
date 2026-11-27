@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Monthly Signal Stack Audit</h1>
+<div class="row"><form method="post" action="/c/{{ company.id }}/run/monthly_audit"><button class="btn">Run source-health audit now</button></form>
+<span class="small muted">Also runs automatically every month (Settings).</span></div>
+<div class="grid" style="grid-template-columns:220px 1fr;margin-top:12px">
+<div>{% for r in rows %}<div><a href="?aid={{ r.id }}">{{ r.created_at|dt }}</a> <span class="tiny muted">{{ r.trigger }}</span></div>{% else %}<p class="muted">No audits yet.</p>{% endfor %}</div>
+<div>{% if cur %}
+<div class="grid g4">
+<div class="stat"><div class="n">{{ report.healthy|length }}</div><div class="l">healthy</div></div>
+<div class="stat"><div class="n">{{ (report.dead|length) + (report.failing|length) }}</div><div class="l">dead / failing</div></div>
+<div class="stat"><div class="n">{{ report.duplicates|length }}</div><div class="l">duplicate pairs</div></div>
+<div class="stat"><div class="n">{{ report.new_sources|length }}</div><div class="l">newly discovered</div></div></div>
+<div class="brief-body">{{ cur.markdown|md|safe }}</div>
+<p class="small muted">Recommendations are applied in the <a href="/c/{{ company.id }}/sources">Source Manager</a> (new sources wait there as "discovered").</p>
+{% endif %}</div></div>
+{% endblock %}

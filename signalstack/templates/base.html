@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Signal Stack{% endblock %}{% if company %} · {{ company.name }}{% endif %}</title>
+<link rel="stylesheet" href="/static/style.css"><script src="/static/app.js" defer></script></head>
+<body {% if running %}data-reload-on-done{% endif %}>
+<div class="layout">
+<aside class="side">
+  <div class="logo">◆ Signal Stack</div>
+  <div class="sub">Company intelligence &amp; executive briefing</div>
+  <a href="/" class="{{ 'on' if request.url.path == '/' }}">All companies</a>
+  {% if company %}
+  <div class="sect">{{ company.name }}</div>
+  {% set path = request.url.path %}
+  {% set base = '/c/' ~ company.id %}
+  <a href="{{ base }}" class="{{ 'on' if path == base }}">Overview</a>
+  <a href="{{ base }}/profile" class="{{ 'on' if '/profile' in path }}">Intelligence Profile</a>
+  <a href="{{ base }}/interview" class="{{ 'on' if '/interview' in path }}">AI Interview</a>
+  <a href="{{ base }}/stack" class="{{ 'on' if '/stack' in path }}">Signal Stack</a>
+  <a href="{{ base }}/sources" class="{{ 'on' if '/sources' in path }}">Source Manager</a>
+  <a href="{{ base }}/feed" class="{{ 'on' if '/feed' in path or '/items' in path }}">Intelligence Feed</a>
+  <a href="{{ base }}/briefs" class="{{ 'on' if '/briefs' in path }}">Monday Brief</a>
+  <a href="{{ base }}/audits" class="{{ 'on' if '/audits' in path }}">Source-Health Audits</a>
+  <a href="{{ base }}/runs" class="{{ 'on' if '/runs' in path }}">Runs &amp; Failures</a>
+  <a href="{{ base }}/settings" class="{{ 'on' if '/settings' in path }}">Settings</a>
+  {% endif %}
+  {% if companies %}
+  <div class="sect">Switch company</div>
+  <select onchange="location='/c/'+this.value">{% for c in companies %}<option value="{{ c.id }}" {{ 'selected' if company and c.id == company.id }}>{{ c.name }}</option>{% endfor %}</select>
+  {% endif %}
+  <div class="sect">System</div>
+  <div class="tiny" style="padding:0 10px">AI: {{ llm_label }}<br>Scheduler: {{ 'running' if scheduler_on else 'off' }}</div>
+</aside>
+<main class="main">
+  {% for f in recent_failures %}
+  <div class="banner bad"><b>Failed {{ f.job.replace('_',' ') }} run</b> ({{ f.status }}, {{ f.started_at|dt }} UTC): {{ (f.error or '')|trunc(220) }} — <a href="/c/{{ company.id }}/runs">see Runs &amp; Failures</a></div>
+  {% endfor %}
+  {% for j in running %}
+  <div class="banner info" data-job="{{ j.id }}"><b>{{ j.job.replace('_',' ')|title }}</b> <span class="s chip running">running</span> <span class="p">{{ j.progress or '' }}</span></div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</main></div>
+<div class="spinner" id="spinner"><div>Working…</div></div>
+</body></html>

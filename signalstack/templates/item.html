@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 style="font-size:19px">{{ it.title }}</h1>
+<div class="muted"><span class="chip {{ it.category }}">{{ it.category }}</span> <span class="chip {{ it.polarity }}">{{ it.polarity }}</span>
+{% if it.significant %}<span class="chip ok">significant</span>{% endif %} · {{ it.publisher }} · published {{ (it.published_at or 'undated')[:10] }} · discovered {{ it.discovered_at[:10] }}
+· <a href="{{ it.url }}" target="_blank" rel="noopener">open original source ↗</a></div>
+<div class="grid g2" style="margin-top:12px">
+<div class="ev"><h3 style="margin-top:0">Evidence (verbatim from source)</h3>
+<p><b>{{ it.title }}</b></p><p>{{ it.snippet or '(headline only)' }}</p>
+<div class="small muted">Source: <a href="/c/{{ company.id }}/sources/{{ it.source_id }}">{{ it.source_name }}</a> — {{ it.source_reason|trunc(200) }}</div>
+<div class="small"><b>Verification:</b> <span class="chip {{ it.verification }}">{{ (it.verification or '').replace('_',' ') }}</span>
+{% if dups %}<br><b>Corroborated by:</b> {% for d in dups %}<a href="{{ d.url }}" target="_blank" rel="noopener">{{ d.publisher }}</a>; {% endfor %}{% endif %}</div></div>
+<div class="ip"><h3 style="margin-top:0">Interpretation (analysis — not evidence)</h3>
+{% set ip = a.interpretation or {} %}
+<div class="kv small">
+<div>What happened</div><div>{{ ip.what_happened or '—' }}</div>
+<div>Why it matters</div><div>{{ ip.why_it_matters or '—' }}</div>
+<div>Business area</div><div>{{ ip.business_area or '—' }}</div>
+<div>Opportunity / threat</div><div>{{ ip.polarity or it.polarity }}</div>
+<div>Urgency</div><div>{{ ip.urgency or '—' }}</div>
+<div>Consider doing</div><div>{{ ip.consider or '—' }}</div>
+<div>Material (vs general news)</div><div>{{ ip.material }}</div>
+<div>Interpreted by</div><div>{{ a.interpreted_by or 'not yet' }}{% if it.ai_confidence is not none %} · model self-confidence {{ it.ai_confidence|pct }} (not evidence){% endif %}</div>
+</div></div></div>
+<div class="panel"><h3 style="margin-top:0">Ranking</h3>
+<div class="grid g4 small">
+<div>Strategic relevance <b>{{ it.relevance|pct }}</b></div><div>Business impact <b>{{ it.impact|pct }}</b></div>
+<div>Urgency <b>{{ it.urgency|pct }}</b></div><div>Source reliability <b>{{ it.credibility|pct }}</b></div>
+<div>Recency <b>{{ it.recency|pct }}</b></div><div>Novelty <b>{{ it.novelty|pct }}</b></div>
+<div>Evidence strength <b>{{ it.evidence_strength|pct }}</b></div><div>Overall score <b>{{ it.score|pct }}</b></div></div>
+<p class="small"><b>Why it ranked here:</b> {{ it.explanation }}</p>
+<p class="tiny muted">score = 0.30·relevance + 0.22·impact + 0.15·urgency + 0.11·reliability + 0.11·recency + 0.11·novelty. Source reliability,
+evidence strength and strategic relevance are separate measures; the model's self-confidence never feeds the score.</p></div>
+{% endblock %}

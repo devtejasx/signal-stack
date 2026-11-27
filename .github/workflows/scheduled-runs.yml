@@ -1,0 +1,26 @@
+# Free external scheduler. A free web host idles between requests, so this wakes the deployed app and
+# triggers the two automated processes. Needs repo secrets APP_URL and CRON_TOKEN (same value as on the host).
+name: scheduled-runs
+on:
+  schedule:
+    - cron: "0 2 * * 1"    # weekly brief: Monday 02:00 UTC (07:30 IST)
+    - cron: "30 0 1 * *"   # monthly source-health audit: 1st of the month 00:30 UTC
+  workflow_dispatch:
+    inputs:
+      job:
+        description: weekly_brief | monthly_audit | monitor
+        default: weekly_brief
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_TOKEN: ${{ secrets.CRON_TOKEN }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$CRON_TOKEN" ]; then echo "APP_URL/CRON_TOKEN not set - skipping"; exit 0; fi
+          JOB="${{ github.event.inputs.job }}"
+          if [ -z "$JOB" ]; then JOB=weekly_brief; [ "${{ github.event.schedule }}" = "30 0 1 * *" ] && JOB=monthly_audit; fi
+          curl -sS --retry 6 --retry-delay 20 --retry-all-errors --max-time 120 "$APP_URL/health" > /dev/null
+          curl -fsS --retry 3 --retry-delay 20 --max-time 120 -X POST -H "Authorization: Bearer $CRON_TOKEN" "$APP_URL/api/cron/$JOB"

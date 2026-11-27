@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row"><a href="/c/{{ company.id }}/briefs">← all briefs</a><span class="grow"></span>
+<a class="btn sm ghost" href="/c/{{ company.id }}/briefs/{{ b.id }}/export.md">Export Markdown</a>
+<a class="btn sm ghost" href="/c/{{ company.id }}/briefs/{{ b.id }}/export.html" target="_blank">Printable HTML / PDF</a>
+<a class="btn sm ghost" href="/c/{{ company.id }}/briefs/{{ b.id }}/export.email" target="_blank">Email-ready HTML</a>
+<a class="btn sm ghost" href="/c/{{ company.id }}/briefs/{{ b.id }}/export.json" target="_blank">JSON</a>
+<form class="inline" method="post" action="/c/{{ company.id }}/briefs/{{ b.id }}/deliver"><button class="btn sm">Deliver</button></form></div>
+{% if b.delivery %}<div class="tiny muted" style="margin-top:6px">Delivery: {{ b.delivery }} ({{ b.delivered_at|dt }})</div>{% endif %}
+
+<div class="panel" id="actions"><h2 style="margin-top:0">Action tracking</h2>
+<table class="small"><tr><th>Priority</th><th>Action</th><th>Reason</th><th>Owner</th><th>Signals</th><th>Status</th></tr>
+{% for a in acts %}<tr><td><b>{{ a.priority }}</b></td><td>{{ a.action }}</td><td>{{ a.reason|trunc(200) }}</td><td>{{ a.owner }}</td>
+<td class="tiny">{% for s in a.signal_ids|loads %}<a href="#{{ s }}">{{ s }}</a> {% endfor %}</td>
+<td><form method="post" action="/c/{{ company.id }}/actions/{{ a.id }}" class="row"><select name="status" style="width:auto" onchange="this.form.submit()">
+{% for st in ['open','in_progress','done','dismissed'] %}<option {{ 'selected' if a.status == st }}>{{ st }}</option>{% endfor %}</select>
+<input type="text" name="note" value="{{ a.note or '' }}" placeholder="note" style="width:120px"></form></td></tr>
+{% else %}<tr><td colspan="6" class="muted">No actions.</td></tr>{% endfor %}</table></div>
+
+<div class="brief-body">{{ body|safe }}</div>
+{% endblock %}

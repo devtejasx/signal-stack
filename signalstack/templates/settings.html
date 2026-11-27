@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Settings</h1>
+{% if request.query_params.get('saved') %}<div class="banner ok">Settings saved; schedules updated.</div>{% endif %}
+<form method="post" class="panel">
+<h2 style="margin-top:0">A. Weekly Intelligence Brief</h2>
+<label><input type="checkbox" name="brief_enabled" value="1" {{ 'checked' if s.brief_enabled }}> Enabled</label>
+<div class="grid g3"><div><label>Briefing day</label><select name="briefing_day">{% for d in ['mon','tue','wed','thu','fri','sat','sun'] %}<option {{ 'selected' if s.briefing_day == d }}>{{ d }}</option>{% endfor %}</select></div>
+<div><label>Briefing time</label><input type="time" name="briefing_time" value="{{ s.briefing_time }}"></div>
+<div><label>Time zone (IANA)</label><input type="text" name="timezone" value="{{ s.timezone }}"></div></div>
+<label>Deliver to (email; needs SMTP in .env, otherwise saved to outbox)</label><input type="email" name="email_to" value="{{ s.email_to or '' }}">
+<h2>Monitoring between briefs</h2>
+<label><input type="checkbox" name="monitor_enabled" value="1" {{ 'checked' if s.monitor_enabled }}> Enabled</label>
+<div class="grid g3"><div><label>Monitoring frequency (hours)</label><input type="number" name="monitor_every_hours" value="{{ s.monitor_every_hours }}" min="1"></div>
+<div><label>Source refresh frequency (days)</label><input type="number" name="source_refresh_days" value="{{ s.source_refresh_days }}" min="1"></div></div>
+<h2>B. Monthly Signal Stack Audit</h2>
+<label><input type="checkbox" name="audit_enabled" value="1" {{ 'checked' if s.audit_enabled }}> Enabled</label>
+<div class="grid g3"><div><label>Day of month</label><input type="number" name="audit_day_of_month" value="{{ s.audit_day_of_month }}" min="1" max="28"></div>
+<div><label>Time</label><input type="time" name="audit_time" value="{{ s.audit_time }}"></div></div>
+<button class="btn" style="margin-top:14px">Save settings</button>
+</form>
+<div class="panel small"><b>Scheduled next:</b> weekly brief {{ next_runs.weekly_brief|dt or '—' }} · monitoring {{ next_runs.monitor|dt or '—' }} · audit {{ next_runs.monthly_audit|dt or '—' }}<br>
+Company profile updates: edit the <a href="/c/{{ company.id }}/profile">Intelligence Profile</a> or describe a business-context change there.</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Runs &amp; Failures</h1>
+<p class="muted">Every scheduled and manual run is logged. Failed and missed scheduled runs are highlighted here and on every page.</p>
+<div class="kv small panel"><div>Next weekly brief</div><div>{{ next_runs.weekly_brief|dt or '—' }}</div>
+<div>Next monitoring run</div><div>{{ next_runs.monitor|dt or '—' }}</div><div>Next monthly audit</div><div>{{ next_runs.monthly_audit|dt or '—' }}</div></div>
+<h2>Job runs</h2>
+<table class="small"><tr><th>#</th><th>Job</th><th>Trigger</th><th>Started</th><th>Finished</th><th>Status</th><th>Result / error</th></tr>
+{% for j in jobs %}<tr><td>{{ j.id }}</td><td>{{ j.job }}</td><td>{{ j.trigger }}</td><td>{{ j.started_at|dt }}</td><td>{{ j.finished_at|dt }}</td>
+<td><span class="chip {{ j.status }}">{{ j.status }}</span></td>
+<td>{% if j.error %}<details><summary class="bad">{{ j.error|trunc(120) }}</summary><pre class="log">{{ j.error }}</pre></details>{% else %}{{ j.result_ref or j.progress or '' }}{% endif %}
+{% if j.log %}<details><summary class="tiny">log</summary><pre class="log">{{ j.log }}</pre></details>{% endif %}</td></tr>
+{% else %}<tr><td colspan="7" class="muted">No runs yet.</td></tr>{% endfor %}</table>
+<h2>Crawl history</h2>
+<table class="small"><tr><th>#</th><th>Trigger</th><th>Started</th><th>Status</th><th>Sources checked</th><th>Records found</th><th>New</th><th>Duplicates</th><th>Source errors</th></tr>
+{% for c in crawls %}<tr><td>{{ c.id }}</td><td>{{ c.trigger }}</td><td>{{ c.started_at|dt }}</td><td><span class="chip {{ c.status }}">{{ c.status }}</span></td>
+<td>{{ c.sources_checked }}</td><td>{{ c.items_found }}</td><td>{{ c.items_new }}</td><td>{{ c.items_duplicate }}</td>
+<td class="tiny">{% for e in (c.errors|loads or []) %}{{ e.name|trunc(40) }}: {{ e.status }}; {% endfor %}</td></tr>
+{% else %}<tr><td colspan="9" class="muted">No crawls yet.</td></tr>{% endfor %}</table>
+{% endblock %}

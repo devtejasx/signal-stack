@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Signal Stack</h1>
+<p class="muted">Enter a company name and website. The system researches the business, interviews the founder, builds a justified
+Signal Stack across Customers, Competitors, Market and Internal intelligence, monitors it and writes a Monday Morning Brief.</p>
+<div class="panel">
+  <h2 style="margin-top:0">Company setup</h2>
+  <form method="post" action="/companies" class="row" data-slow="Creating company and starting research…">
+    <div class="grow"><label>Company name</label><input type="text" name="name" required placeholder="e.g. MeetUniversity"></div>
+    <div class="grow"><label>Website</label><input type="text" name="website" required placeholder="https://www.meetuniversity.com"></div>
+    <div><label>&nbsp;</label><button class="btn">Research company →</button></div>
+  </form>
+</div>
+<h2>Configured companies</h2>
+<table>
+<tr><th>Company</th><th>Website</th><th>Stage</th><th>Competitors</th><th>Approved sources</th><th>Records</th><th>Briefs</th></tr>
+{% for r in rows %}
+<tr><td><a href="/c/{{ r.id }}"><b>{{ r.name }}</b></a></td><td><a href="{{ r.website }}" target="_blank" rel="noopener">{{ r.domain }}</a></td>
+<td><span class="chip">{{ r.status }}</span></td><td>{{ r.competitors }}</td><td>{{ r.sources }}</td><td>{{ r['items'] }}</td><td>{{ r.briefs }}</td></tr>
+{% else %}<tr><td colspan="7" class="muted">No companies yet.</td></tr>{% endfor %}
+</table>
+{% endblock %}

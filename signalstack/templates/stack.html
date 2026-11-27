@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Signal Stack</h1>
+<p class="muted">Approved sources by intelligence category. Every source has a reason for inclusion, and the scores come from probing the source
+(fetching it once): <b>specific</b> = share/similarity of its records to this company's problem space, <b>recent</b> = freshness of its newest record,
+<b>credible</b> = publisher/source-type reliability.</p>
+<div class="row"><form method="post" action="/c/{{ company.id }}/run/discovery"><button class="btn">Rebuild / discover more</button></form>
+<a class="btn ghost" href="/c/{{ company.id }}/sources">Source Manager</a></div>
+
+<div class="cols4" style="margin-top:14px">
+{% for cat, label in [('customers','A. Customers'),('competitors','B. Competitors'),('market','C. Market'),('internal','D. Internal')] %}
+<div>
+  <h2 style="margin-top:0">{{ label }} <span class="chip {{ cat }}">{{ sources|selectattr('category','equalto',cat)|list|length }}</span></h2>
+  {% for s in sources if s.category == cat %}
+  <div class="src">
+    <div class="nm"><a href="/c/{{ company.id }}/sources/{{ s.id }}">{{ s.name }}</a></div>
+    <div class="tiny muted">{{ s.type }}{% if s.competitor %} · {{ s.competitor }}{% endif %} · origin: {{ s.origin }}</div>
+    <div class="rs">{{ s.reason|trunc(330) }}</div>
+    <div class="tiny score" style="margin-top:4px">specific {{ s.specific_score|pct }} · recent {{ s.recency_score|pct }} · credible {{ s.credibility_score|pct }} · <b>overall {{ s.overall_score|pct }}</b></div>
+  </div>
+  {% else %}<p class="muted small">No approved sources.</p>{% endfor %}
+</div>
+{% endfor %}
+</div>
+
+<h2 id="competitors">Competitor &amp; substitute profiles</h2>
+<p class="small muted">Candidates come from research, the founder interview and category news; each is verified by fetching its live homepage and
+measuring similarity to this company. Nothing is hard-coded.</p>
+<table>
+<tr><th>Competitor</th><th>Type</th><th>Why it matters / verification</th><th>Similarity</th><th>Signals</th><th>Status</th><th></th></tr>
+{% for k in comps %}
+<tr><td><b>{{ k.name }}</b><br>{% if k.website %}<a class="tiny" href="{{ k.website }}" target="_blank" rel="noopener">{{ k.domain }}</a>{% endif %}
+<div class="tiny muted">{{ k.description|trunc(140) }}</div></td>
+<td>{{ k.kind or '' }}</td><td class="small">{{ k.why|trunc(330) }}</td>
+<td class="score">{{ k.similarity|pct }}</td><td>{{ comp_counts.get(k.id, 0) }}</td><td><span class="chip {{ k.status }}">{{ k.status }}</span></td>
+<td>{% if k.status != 'approved' and k.website %}<form class="inline" method="post" action="/c/{{ company.id }}/competitors/{{ k.id }}/approve"><button class="btn sm green">Approve</button></form>{% endif %}
+{% if k.status != 'rejected' %}<form class="inline" method="post" action="/c/{{ company.id }}/competitors/{{ k.id }}/reject"><button class="btn sm red">Reject</button></form>{% endif %}</td></tr>
+{% endfor %}
+</table>
+<div class="panel"><h3 style="margin-top:0">Add a competitor</h3>
+<form method="post" action="/c/{{ company.id }}/competitors" class="row" data-slow="Adding and verifying competitor…">
+<div class="grow"><label>Name</label><input type="text" name="name" required></div><div class="grow"><label>Website</label><input type="text" name="website" required></div>
+<div class="grow"><label>Why</label><input type="text" name="why"></div><div><label>&nbsp;</label><button class="btn">Add &amp; verify</button></div></form></div>
+{% endblock %}

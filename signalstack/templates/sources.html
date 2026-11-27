@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Source Manager</h1>
+<p class="muted">Approve discovered sources, remove or restore sources, add your own, see health (last check, failures, records) and duplicates.
+Access-restricted sources are listed as <span class="chip blocked">blocked</span> and are never scraped.</p>
+<div class="row">
+{% for st in ['', 'discovered', 'approved', 'blocked', 'rejected', 'removed'] %}
+<a class="btn sm {{ '' if status == st else 'ghost' }}" href="?status={{ st }}&category={{ category }}">{{ st or 'all' }} {% if st %}({{ counts.get(st, 0) }}){% endif %}</a>
+{% endfor %}
+<span style="width:20px"></span>
+{% for cat in ['', 'customers', 'competitors', 'market', 'internal'] %}
+<a class="btn sm {{ '' if category == cat else 'ghost' }}" href="?status={{ status }}&category={{ cat }}">{{ cat or 'all categories' }}</a>
+{% endfor %}
+</div>
+<table style="margin-top:12px">
+<tr><th>Source</th><th>Category</th><th>Reason for monitoring</th><th>Scores</th><th>Health</th><th>Status</th><th></th></tr>
+{% for s in rows %}
+<tr>
+<td><a href="/c/{{ company.id }}/sources/{{ s.id }}"><b>{{ s.name|trunc(70) }}</b></a><div class="tiny muted">{{ s.type }}{% if s.competitor %} · {{ s.competitor }}{% endif %} · {{ s.origin }}</div>
+{% if s.url %}<a class="tiny" href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url|trunc(60) }}</a>{% endif %}</td>
+<td><span class="chip {{ s.category }}">{{ s.category }}</span></td>
+<td class="small" style="max-width:420px">{{ s.reason|trunc(300) }}</td>
+<td class="tiny score">spec {{ s.specific_score|pct }}<br>recent {{ s.recency_score|pct }}<br>cred {{ s.credibility_score|pct }}<br><b>all {{ s.overall_score|pct }}</b></td>
+<td class="tiny">{% if s.last_checked %}checked {{ s.last_checked|dt }}<br>{% endif %}{% if s.last_status %}<span class="chip {{ s.last_status }}">{{ s.last_status }}</span><br>{% endif %}
+records {{ s.items_total }}{% if s.consecutive_failures %}<br><span class="chip failed">{{ s.consecutive_failures }} failures</span>{% endif %}
+{% if s.duplicate_name %}<br><span class="chip">duplicate of {{ s.duplicate_name|trunc(30) }}</span>{% endif %}</td>
+<td><span class="chip {{ s.status }}">{{ s.status }}</span></td>
+<td style="white-space:nowrap">
+{% if s.status in ('discovered','rejected') %}<form class="inline" method="post" action="/c/{{ company.id }}/sources/{{ s.id }}/approve"><button class="btn sm green">Approve</button></form>{% endif %}
+{% if s.status == 'discovered' %}<form class="inline" method="post" action="/c/{{ company.id }}/sources/{{ s.id }}/reject"><button class="btn sm red">Reject</button></form>{% endif %}
+{% if s.status == 'approved' %}<form class="inline" method="post" action="/c/{{ company.id }}/sources/{{ s.id }}/remove"><button class="btn sm red">Remove</button></form>{% endif %}
+{% if s.status == 'removed' %}<form class="inline" method="post" action="/c/{{ company.id }}/sources/{{ s.id }}/restore"><button class="btn sm ghost">Restore</button></form>{% endif %}
+</td></tr>
+{% else %}<tr><td colspan="7" class="muted">No sources.</td></tr>{% endfor %}
+</table>
+
+<div class="grid g2">
+<div class="panel"><h2 style="margin-top:0">Add a source</h2>
+<form method="post" action="/c/{{ company.id }}/sources">
+<div class="grid g2"><div><label>Category</label><select name="category"><option>customers</option><option>competitors</option><option>market</option></select></div>
+<div><label>Type</label><select name="type"><option value="rss">RSS/Atom feed or site with a feed</option><option value="bing_news">News search query</option>
+<option value="webpage">Watch a web page for changes</option><option value="site_updates">New posts on a blog/news page</option>
+<option value="gdelt">GDELT global news query</option><option value="hn">Hacker News query</option></select></div></div>
+<label>Name</label><input type="text" name="name" required>
+<div class="grid g2"><div><label>URL (feeds, pages)</label><input type="text" name="url"></div><div><label>Query (news searches)</label><input type="text" name="query"></div></div>
+<label>Competitor (optional)</label><select name="competitor_id"><option value="">—</option>{% for k in comps %}<option value="{{ k.id }}">{{ k.name }}</option>{% endfor %}</select>
+<label>Reason for monitoring (required)</label><input type="text" name="reason" required>
+<button class="btn" style="margin-top:10px">Add source</button></form></div>
+
+<div class="panel"><h2 style="margin-top:0">Upload internal data</h2>
+<p class="small muted">CRM exports, sales/meeting transcripts, support conversations, internal reports or product feedback. CSV, Excel, PDF or text.</p>
+<form method="post" action="/c/{{ company.id }}/upload" enctype="multipart/form-data" data-slow="Parsing and analysing upload…">
+<input type="file" name="file" accept=".csv,.xlsx,.xls,.pdf,.txt,.md,.vtt" required>
+<label>What is it?</label><select name="label"><option value="crm_export">CRM export</option><option value="call_transcripts">Sales / meeting transcripts</option>
+<option value="support">Support conversations</option><option value="feedback">Product / customer feedback</option><option value="report">Internal report</option><option value="other">Other</option></select>
+<label><input type="checkbox" name="synthetic" value="1"> This is synthetic test data (it will be labelled as such everywhere)</label>
+<button class="btn" style="margin-top:8px">Upload</button></form>
+{% if uploads %}<h3>Uploads</h3>{% for u in uploads %}{% set sm = u.summary|loads %}
+<div class="small" style="margin:6px 0"><b>{{ u.filename }}</b> {% if u.is_synthetic %}<span class="chip high">synthetic test data</span>{% endif %} · {{ u.records }} records · {{ u.uploaded_at|dt }}
+<div class="tiny muted">{% for k, v in (sm.labels or {}).items() %}{{ k }}: {{ v }} · {% endfor %}</div>
+{% for t in (sm.themes or [])[:4] %}<div class="tiny">– {{ t.theme }} ({{ t.count }}): {{ t.insight|trunc(140) }}</div>{% endfor %}</div>{% endfor %}{% endif %}
+</div></div>
+{% endblock %}

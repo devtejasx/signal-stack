@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Monday Morning Brief</h1>
+<div class="row"><form method="post" action="/c/{{ company.id }}/run/manual_brief"><button class="btn">Generate brief now (crawl → analyse → brief)</button></form>
+<span class="muted small">The weekly brief also runs automatically — see Settings.</span></div>
+<h2>History</h2>
+<table><tr><th>Brief</th><th>Created</th><th>Period</th><th>Trigger</th><th>Analysis</th><th>Delivery</th></tr>
+{% for b in rows %}<tr><td><a href="/c/{{ company.id }}/briefs/{{ b.id }}"><b>{{ b.title }}</b></a></td><td>{{ b.created_at|dt }}</td>
+<td class="small">{{ (b.period_start or '')[:10] }} → {{ (b.period_end or '')[:10] }}</td><td>{{ b.trigger }}</td><td class="small">{{ b.llm }}</td><td class="small">{{ b.delivery or '' }}</td></tr>
+{% else %}<tr><td colspan="6" class="muted">No briefs yet.</td></tr>{% endfor %}</table>
+{% endblock %}

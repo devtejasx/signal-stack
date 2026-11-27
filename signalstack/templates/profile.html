@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Company Intelligence Profile</h1>
+<p class="muted">Built from initial research (verified facts vs. assumptions) and the founder interview. Everything here is editable;
+saving re-scores every collected signal against the updated profile.</p>
+{% if request.query_params.get('saved') %}<div class="banner ok">Profile saved and signals re-scored.</div>{% endif %}
+
+<div class="grid g2">
+<div class="panel">
+  <h2 style="margin-top:0">Verified facts <span class="chip ok">{{ facts|selectattr('kind','equalto','fact')|list|length }}</span></h2>
+  <p class="tiny muted">Each fact was matched against the text of a page we actually fetched.</p>
+  {% for f in facts if f.kind == 'fact' %}
+  <div class="small" style="margin:6px 0">• {{ f.statement }} <span class="tiny muted">— {% if f.source_url %}<a href="{{ f.source_url }}" target="_blank" rel="noopener">source</a>{% endif %} · {{ f.verification }}</span></div>
+  {% endfor %}
+</div>
+<div class="panel">
+  <h2 style="margin-top:0">Assumptions to confirm <span class="chip discovered">{{ facts|selectattr('kind','equalto','assumption')|list|length }}</span></h2>
+  <p class="tiny muted">Inferences that could not be matched to fetched text. The interview confirms or corrects them.</p>
+  {% for f in facts if f.kind == 'assumption' %}
+  <div class="small" style="margin:6px 0">• {{ f.statement }} <span class="tiny muted">— basis: {{ f.verification }}</span></div>
+  {% endfor %}
+  <h3>Pages read</h3>
+  {% for pg in pages %}<div class="tiny"><span class="chip">{{ pg.kind }}</span> <a href="{{ pg.url }}" target="_blank" rel="noopener">{{ pg.url|trunc(80) }}</a></div>{% endfor %}
+</div>
+</div>
+
+<form method="post" action="/c/{{ company.id }}/profile" data-slow="Saving and re-scoring signals…">
+<div class="panel">
+  <h2 style="margin-top:0">Research profile</h2>
+  <label>Summary</label><textarea name="summary">{{ p.summary }}</textarea>
+  <div class="grid g2">
+    <div><label>Industry</label><input type="text" name="industry" value="{{ p.industry }}"></div>
+    <div><label>Business model</label><input type="text" name="business_model" value="{{ p.business_model }}"></div>
+  </div>
+  <div class="grid g3">
+  {% for k in ['offerings','customer_segments','geographies','value_props','revenue_streams','category_keywords','customer_problem_queries','market_topics','regulatory_topics'] %}
+    <div><label>{{ k.replace('_',' ')|title }} (one per line)</label><textarea name="{{ k }}">{{ (p[k] or [])|join('\n') }}</textarea></div>
+  {% endfor %}
+  </div>
+</div>
+<div class="panel" id="interview">
+  <h2 style="margin-top:0">Founder intelligence (from the interview)</h2>
+  <div class="grid g2">
+  {% for k, label in intel_fields %}
+    <div><label>{{ label }}{% if k in (p.skipped_areas or []) %} <span class="chip">skipped – confidential</span>{% endif %}</label>
+    <textarea name="intel_{{ k }}">{% for v in p.intelligence.get(k, []) %}{{ v.text if v is mapping else v }}
+{% endfor %}</textarea></div>
+  {% endfor %}
+  </div>
+  <button class="btn" style="margin-top:12px">Save profile</button>
+</div>
+</form>
+
+<div class="panel">
+  <h2 style="margin-top:0">Interview answers <a class="btn sm ghost" href="/c/{{ company.id }}/interview">Open interview</a></h2>
+  {% for q in qa if q.status != 'pending' %}
+  <div class="qa {{ 'follow' if q.is_followup }}"><div class="q">{{ 'Follow-up: ' if q.is_followup }}{{ q.question }} <span class="chip">{{ FIELD_LABEL.get(q.area, q.area) }}</span></div>
+    <form method="post" action="/c/{{ company.id }}/interview/{{ q.id }}/edit" data-slow="Updating profile…">
+      <textarea name="answer" style="min-height:60px">{{ q.answer or '' }}</textarea>
+      <button class="btn sm ghost">Update answer</button> {% if q.status == 'skipped' %}<span class="chip">skipped</span>{% endif %}</form></div>
+  {% else %}<p class="muted">No answers yet.</p>{% endfor %}
+</div>
+
+<div class="panel">
+  <h2 style="margin-top:0">Business context changed?</h2>
+  <p class="small muted">Describe what changed (new market, product pivot, new customer segment…). The system updates the profile, reassesses every
+  source's relevance, retires sources that no longer fit, discovers new ones and records what changed and why.</p>
+  <form method="post" action="/c/{{ company.id }}/context"><textarea name="change" required placeholder="e.g. We are pausing the UK and focusing on Germany and Ireland for postgraduate STEM students from 2027."></textarea>
+  <button class="btn" style="margin-top:8px">Reassess Signal Stack</button></form>
+  {% if revisions %}<h3>Revisions</h3>{% for r in revisions %}<div class="small"><a href="/c/{{ company.id }}/revisions/{{ r.id }}">{{ r.created_at|dt }} — {{ r.reason|trunc(110) }}</a></div>{% endfor %}{% endif %}
+  <h3>Profile version history</h3>
+  {% for h in history %}<div class="tiny muted">v{{ h.version }} · {{ h.created_at|dt }} · {{ h.reason }}</div>{% endfor %}
+</div>
+{% endblock %}

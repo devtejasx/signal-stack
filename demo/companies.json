@@ -1,0 +1,87 @@
+{
+  "_note": "Demo founder answers were written by the candidate from each company's public website and public information. They are NOT statements from the companies. Answers are keyed by interview AREA because questions are generated adaptively per company; '<area>_followup' answers any follow-up in that area. 'SKIP' demonstrates skipping a confidential question.",
+  "companies": [
+    {
+      "key": "meetuniversity",
+      "name": "MeetUniversity",
+      "website": "https://www.meetuniversity.com",
+      "synthetic_upload": "demo/SYNTHETIC_crm_export_meetuniversity.csv",
+      "answers": {
+        "business_lines": "Our core business is end-to-end study-abroad counselling for Indian students: university and course shortlisting, application support (SOPs, LORs, documents), visa and financial guidance (blocked accounts, proof of funds, loans), test-prep resources and pre-departure support. Most revenue comes from premium counselling packages paid by students; the rest from university partnerships and referral fees from service partners such as education-loan providers and accommodation.",
+        "business_lines_followup": "Premium counselling packages are the largest share. University partnership income depends on destination; Germany public universities pay nothing, so Germany students only pay us for counselling.",
+        "priority_segments": "Postgraduate STEM and MBA aspirants aged 21-27 from Tier-1 and Tier-2 Indian cities, targeting the UK, Germany, Ireland, Canada and the USA. Parents are co-decision makers and usually pay. Germany (low tuition public universities) is our fastest-growing segment.",
+        "priority_segments_followup": "Master's students for the September intake are the highest value because they buy the full package including visa support.",
+        "customer_problems": "Students do not know which universities fit their profile and budget, they fear visa refusals, they struggle with SOPs and document deadlines, and they find it hard to verify information or trust agents. Parents worry about total cost, return on investment and safety.",
+        "customer_problems_followup": "The biggest recent worry is visa and post-study work uncertainty: students ask whether the UK Graduate Route or Canada permits will still exist when they graduate.",
+        "differentiators": "Mentors who themselves studied at top universities abroad, direct connections with current students and alumni of target universities, unbiased advice across 1000+ universities, and an online-first model that is cheaper and faster than walk-in agents.",
+        "differentiators_followup": "Students tell us the alumni conversations are what convinced them, because they hear real experiences instead of sales talk.",
+        "competitors": "Large consultancies like IDP Education and AECC, digital platforms like Leverage Edu, Yocket, upGrad Abroad and Leap Scholar, plus university-paid agents who counsel for free and local agents in every city. We most often lose to free or cheap agents on price and to Leverage Edu and Leap Scholar on marketing reach.",
+        "competitors_followup": "Watch their pricing, any money-back or visa-guarantee offers, new destination launches, education-loan tie-ups and funding rounds, because those change what students expect from us.",
+        "market_changes": "Destination policies are shifting fast: Canada's study permit caps, UK restrictions on dependants and debate about the Graduate Route, US visa appointment delays and policy uncertainty, Australia's visa fee hikes and enrolment caps, while Germany, Ireland and France are attracting more Indian students. AI tools are also changing how students research universities and write SOPs.",
+        "market_changes_followup": "Germany and Ireland: APS certificate backlogs for Germany and the Irish stay-back visa rules matter most to our pipeline.",
+        "material_risks": "Further tightening of student visas or post-study work rights in our top destinations, regulation of agent commissions, fraud scandals that damage trust in consultants, and well-funded competitors cutting prices.",
+        "material_risks_followup": "A UK change to the Graduate Route would hit us hardest because the UK is our largest destination.",
+        "growth_priorities": "Grow Germany and Ireland counselling, add education-loan and accommodation partnerships, improve lead-to-enrolment conversion with faster counsellor response times, and run more webinars and content to lower acquisition cost.",
+        "growth_priorities_followup": "Conversion is the most urgent: many leads go cold because we respond slowly on WhatsApp.",
+        "internal_data": "Our CRM lead notes (stage, destination, lost reasons), counsellor call notes, WhatsApp and support conversations, and student feedback after enrolment. Lost-deal reasons are the most useful.",
+        "internal_data_followup": "We can export the CRM as CSV every week.",
+        "decisions": "Which destinations and programs to prioritise each intake, where to increase or cut marketing spend, which partnerships (loans, universities) to pursue, how to price packages against competitors, and which policy changes we must communicate to students immediately.",
+        "decisions_followup": "Every Monday I want to know if any visa or policy change requires us to update our counselling advice that week."
+      }
+    },
+    {
+      "key": "zerodha",
+      "name": "Zerodha",
+      "website": "https://zerodha.com",
+      "answers": {
+        "business_lines": "Stock broking is the core: free equity delivery and a flat fee per order for intraday and F&O, on our Kite trading platform. We also offer Coin for direct mutual funds, Varsity for investor education, and Zerodha Fund House, our asset management company. Brokerage from F&O traders has historically been the largest revenue line.",
+        "business_lines_followup": "F&O brokerage fell after the SEBI derivative rules, so the asset management business and long-term investing products matter more now.",
+        "priority_segments": "Active traders in equity derivatives generate most revenue, but long-term retail investors and first-time young investors from smaller cities are the segment we most want to grow.",
+        "priority_segments_followup": "Long-term investors using SIPs and index funds through Coin and our AMC.",
+        "customer_problems": "Investors want low cost, reliable platforms on high-volume days, simple tools and honest education. Pain points are app outages or slowness on volatile days, support wait times, and many F&O traders losing money.",
+        "customer_problems_followup": "Platform reliability during market spikes is the complaint that damages trust the most.",
+        "differentiators": "Lowest cost and transparent pricing, a clean platform without spam or dark patterns, strong investor education through Varsity, and a long track record of trust.",
+        "differentiators_followup": "Trust and no-nonsense product design; we do not push trading.",
+        "competitors": "Groww is the largest by active clients, then Angel One, Upstox, Dhan and bank brokers such as ICICI Direct and HDFC Securities. Fintech apps like Paytm Money and new zero-brokerage offers are substitutes.",
+        "competitors_followup": "Watch pricing changes, new product launches like MTF and algo tools, IPO and fundraising news, outages, and active client numbers published by the exchanges.",
+        "market_changes": "SEBI's F&O curbs and true-to-label exchange charges changed broker economics; mutual fund SIP inflows keep growing; regulators are formalising retail algo trading; market volatility drives volumes.",
+        "market_changes_followup": "The retail algo trading framework and any further derivative restrictions.",
+        "material_risks": "Further SEBI restrictions on derivatives, a major outage, a cybersecurity incident, a prolonged bear market reducing activity, and price wars from well-funded competitors.",
+        "material_risks_followup": "Regulatory changes to derivatives would have the largest immediate revenue impact.",
+        "growth_priorities": "Grow Zerodha Fund House assets, deepen long-term investing products, keep the platform reliable, and expand investor education.",
+        "growth_priorities_followup": "Index funds and ETFs through the AMC.",
+        "internal_data": "SKIP",
+        "decisions": "How to respond to regulatory changes, whether and how to change pricing, which products to prioritise, and how to communicate with customers during incidents.",
+        "decisions_followup": "Pricing and product prioritisation after regulatory changes."
+      }
+    },
+    {
+      "key": "licious",
+      "name": "Licious",
+      "website": "https://www.licious.in",
+      "context_change": "We are pausing new city launches in India and will enter the UAE (Dubai and Abu Dhabi) in 2027 with ready-to-cook seafood and marinated meats sourced from India. Quick-commerce competition in India is now a secondary concern; UAE food-import regulation, UAE grocery delivery competitors and Gulf consumer demand are now the priority.",
+      "answers": {
+        "business_lines": "We sell fresh meat, seafood, eggs, marinades and ready-to-cook products directly to consumers through our app and website, with our own sourcing, processing and cold chain, plus a few offline experience stores. Revenue is product sales.",
+        "business_lines_followup": "Ready-to-cook and marinated products have higher margins than raw meat and are growing faster.",
+        "priority_segments": "Urban households in Bengaluru, Hyderabad, Mumbai, Delhi NCR, Pune and Chennai who value hygiene and quality over the lowest price, especially working professionals and young families.",
+        "priority_segments_followup": "Repeat customers in Bengaluru and Hyderabad are the most valuable.",
+        "customer_problems": "Customers worry about freshness, hygiene and consistency of meat from local shops, want fast delivery, and compare prices with quick-commerce apps and neighbourhood butchers.",
+        "customer_problems_followup": "Delivery time expectations have dropped from hours to minutes because of quick commerce.",
+        "differentiators": "Quality and hygiene guarantees, control of the supply chain from sourcing to delivery, consistent cuts, and a wide range of ready-to-cook products.",
+        "differentiators_followup": "Customers mention freshness and clean cuts most often.",
+        "competitors": "FreshToHome, quick-commerce apps such as Zepto, Blinkit and Swiggy Instamart selling meat, BigBasket, TenderCuts, and neighbourhood butchers.",
+        "competitors_followup": "Quick-commerce pricing and delivery speed for meat and seafood.",
+        "market_changes": "Quick commerce is moving into fresh meat and seafood, meat prices are volatile, bird flu outbreaks affect chicken demand, and food-safety enforcement by FSSAI is increasing.",
+        "market_changes_followup": "Bird flu outbreaks and feed-cost inflation.",
+        "material_risks": "Avian influenza outbreaks, a price war with quick-commerce platforms, cold-chain cost increases, and stricter rules on meat sale and licensing.",
+        "material_risks_followup": "Bird flu has the fastest impact on demand.",
+        "growth_priorities": "Reach sustained profitability, grow ready-to-cook, improve repeat rate, and be ready for an IPO.",
+        "growth_priorities_followup": "Profitability per city comes first.",
+        "internal_data": "App reviews, NPS surveys, delivery-time data and customer support tickets.",
+        "internal_data_followup": "Support tickets about delivery delays and quality complaints.",
+        "decisions": "City-level pricing versus quick commerce, which product lines to expand, where to open experience stores, and how to respond to supply shocks.",
+        "decisions_followup": "Pricing decisions each week."
+      }
+    }
+  ]
+}
