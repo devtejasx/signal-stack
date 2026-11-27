@@ -41,7 +41,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 # Free-tier limits are per model, so several models form a fallback chain (best first). Models the account
 # cannot use are filtered out at runtime via GET /models.
 GROQ_MODELS = os.getenv("GROQ_MODELS", os.getenv("GROQ_MODEL", "") or
-                        "openai/gpt-oss-120b,llama-3.3-70b-versatile,moonshotai/kimi-k2-instruct-0905,"
+                        "openai/gpt-oss-120b,qwen/qwen3.8-27b,llama-3.3-70b-versatile,moonshotai/kimi-k2-instruct-0905,"
                         "moonshotai/kimi-k2-instruct,meta-llama/llama-4-maverick-17b-128e-instruct,"
                         "meta-llama/llama-4-scout-17b-16e-instruct,qwen/qwen3-32b,openai/gpt-oss-20b,llama-3.1-8b-instant")
 GROQ_REASONING_EFFORT = os.getenv("GROQ_REASONING_EFFORT", "low")

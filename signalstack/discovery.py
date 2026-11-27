@@ -592,6 +592,19 @@ def build_signal_stack(company_id: int, ctx: JobContext | None = None, origin: s
             c["id"] = db.insert("competitors", row)
         c["status"] = row["status"]
 
+    # Keep the stack focused: at most 10 approved competitors across discovery runs. Founder-named ones stay; the
+    # weakest (lowest homepage similarity) of the rest go back to 'discovered' for the founder to review.
+    appr = db.q("SELECT id, name, similarity, discovered_via FROM competitors WHERE company_id=? AND status='approved'",
+                (company_id,))
+    if len(appr) > 10:
+        appr.sort(key=lambda r: ("founder" in (r["discovered_via"] or ""), r["similarity"] or 0), reverse=True)
+        for r in appr[10:]:
+            db.update("competitors", r["id"], {"status": "discovered"})
+            for c in comps:
+                if c.get("id") == r["id"]:
+                    c["status"] = "discovered"
+        step(f"Competitor cap: {len(appr) - 10} lower-similarity competitor(s) moved to 'discovered' for founder review")
+
     ref_doc = interest_document(company_id, p)
     keywords = set(tokens(" ".join(p.get("category_keywords", []) + p.get("offerings", [])[:5] + p.get("geographies", []))))
     cands = _candidates(company_id, comps, step)

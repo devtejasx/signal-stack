@@ -64,7 +64,9 @@ Rules:
 - If a category has no meaningful signals, say so; never invent developments, numbers or names.
 - Actions must be doable this week, have a clear owner role and a reason tied to cited signals.
 - Opportunities and risks must come from what the cited signals show. The founder's priorities may shape the interpretation,
-  but never cite a signal for something it does not say. Fewer, well-evidenced items beat padded lists."""
+  but never cite a signal for something it does not say. Fewer, well-evidenced items beat padded lists.
+- Signals whose title starts with [SYNTHETIC TEST DATA] come from a synthetic demo file, not real company data: never
+  present them as real events; if you use one, say "synthetic test data shows ..."."""
 
 SYN_PROMPT = """Company profile (research + founder interview):
 {profile}
@@ -190,6 +192,7 @@ def generate_brief(company_id: int, trigger: str = "manual", run_id: int | None 
             brief[c]["none"] = (f"No meaningful {CAT_LABEL[c].lower()} development this period: {window_count.get(c, 0)} records "
                                 f"collected from {src_count.get(c, 0)} approved sources, none passed the relevance/significance "
                                 f"threshold." if src_count.get(c) else f"No approved {CAT_LABEL[c].lower()} sources yet.")
+    label_synthetic(brief)
     md = render_markdown(brief)
     page = render_html(brief, md)
     bid = db.insert("briefs", {"company_id": company_id, "created_at": db.now(), "period_start": start, "period_end": end,
@@ -265,6 +268,19 @@ def _grounding_check(syn: dict, by_sid: dict[str, dict]) -> dict:
     for key in _CLAIM_TEXT:
         syn[key] = keep[key]
     return {"checked": len(index), "removed": len(removed), "partial": partial, "removed_claims": removed, "by": used}
+
+
+SYNTHETIC_NOTE = "based on SYNTHETIC test CRM data uploaded for the demo, not real company data"
+
+
+def label_synthetic(b: dict) -> dict:
+    """Tag every statement that relies on synthetic internal test data so it can never pass as a real development."""
+    syn_ids = {r["id"] for r in b.get("appendix", []) if str(r.get("title", "")).startswith("[SYNTHETIC")}
+    for key in ("executive_summary", "opportunities", "risks", "actions", "watch"):
+        for x in b.get(key, []):
+            if syn_ids & set(x.get("signal_ids", [])):
+                x["synthetic"] = True
+    return b
 
 
 def _validate(data: dict, ids_valid: set[str]) -> dict | None:
@@ -378,7 +394,8 @@ def _internal_block(company_id: int, window: list[dict], sig_internal: list[dict
 
 # --------------------------------------------------------------------------- rendering
 def _ids(x: dict) -> str:
-    return " ".join(f"[{s}](#{s})" for s in x.get("signal_ids", []))
+    tag = f" ⚠️ *{SYNTHETIC_NOTE}*" if x.get("synthetic") else ""
+    return " ".join(f"[{s}](#{s})" for s in x.get("signal_ids", [])) + tag
 
 
 def render_markdown(b: dict) -> str:

@@ -21,6 +21,8 @@ sys.path.insert(0, str(ROOT))
 from signalstack import analysis, context, db, interview, pipeline  # noqa: E402
 from signalstack.internal import ingest_upload  # noqa: E402
 from signalstack.jobs import run_job  # noqa: E402
+from signalstack.profile import get_profile, save_profile  # noqa: E402
+from signalstack.textutil import domain_of  # noqa: E402
 
 log = logging.getLogger("demo")
 
@@ -42,6 +44,21 @@ def run_interview(cid: int, answers: dict) -> None:
     interview.finish_if_complete(cid)
 
 
+def second_pass(cid: int, fixes: list[dict]) -> None:
+    """Week 2: the founder reviews the Signal Stack and supplies official websites for competitors the automatic lookup
+    could not confirm (same code path as Signal Stack -> add competitor). Every one is re-verified live, then a second
+    crawl and a second brief run - which also demonstrates the historical crawl/brief records."""
+    p = get_profile(cid)
+    for f in fixes:
+        p.setdefault("competitor_candidates", []).append({"name": f["name"], "domain": domain_of(f["website"]),
+                                                          "why": f["why"], "kind": "direct"})
+        p.setdefault("founder_named", {}).setdefault("competitors", []).append(f["name"])
+        save_profile(cid, p, f"competitor added: {f['name']}")
+    run_job(cid, "discovery", "demo", pipeline.discovery_job(cid))
+    run_job(cid, "monitor", "demo", pipeline.monitor_job(cid, "demo"))
+    run_job(cid, "manual_brief", "demo", pipeline.weekly_brief_job(cid, "demo"))
+
+
 def run_company(spec: dict) -> int:
     cid = pipeline.create_company(spec["name"], spec["website"])
     done = lambda job: db.one("SELECT 1 FROM job_runs WHERE company_id=? AND job=? AND status='success'", (cid, job))  # noqa: E731
@@ -60,6 +77,8 @@ def run_company(spec: dict) -> int:
         run_job(cid, "manual_brief", "demo", pipeline.weekly_brief_job(cid, "demo"))
     if not done("monthly_audit"):
         run_job(cid, "monthly_audit", "demo", pipeline.audit_job(cid, "demo"))
+    if spec.get("founder_competitor_fixes") and not db.one("SELECT 1 FROM profile_history WHERE company_id=? AND reason LIKE 'competitor added:%'", (cid,)):
+        second_pass(cid, spec["founder_competitor_fixes"])
     if spec.get("context_change") and not db.one("SELECT 1 FROM stack_revisions WHERE company_id=?", (cid,)):
         run_job(cid, "context_change", "demo", lambda ctx: context.apply_context_change(cid, spec["context_change"], ctx))
     return cid
