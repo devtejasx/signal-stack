@@ -5,6 +5,7 @@ Failures are captured with their traceback and surfaced on the dashboard
 """
 from __future__ import annotations
 
+import os
 import logging
 import threading
 import traceback
@@ -56,10 +57,15 @@ def run_job(company_id: int | None, job: str, trigger: str, fn: Callable[[JobCon
 
 
 def run_in_background(company_id: int | None, job: str, trigger: str, fn: Callable[[JobContext], object]) -> int | None:
-    """Start a job on a daemon thread and return its job id (or the running one)."""
+    """Start a job on a daemon thread and return its job id (or the running one).
+
+    On serverless hosts (Vercel) the function is frozen once the response is sent, which would strand a background
+    thread, so there the job runs inside the request instead (bounded by the platform's max duration)."""
     with _lock:
         if (company_id, job) in _running:
             return _running[(company_id, job)]
+    if os.environ.get("VERCEL") or os.environ.get("SIGNALSTACK_SYNC_JOBS") == "1":
+        return run_job(company_id, job, trigger, fn).get("id")
     holder: dict = {}
     started = threading.Event()
 
