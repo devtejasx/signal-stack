@@ -153,8 +153,13 @@ delivery via SMTP or an `.eml` in the outbox.
 
 * News search relies on Bing News RSS and GDELT; GDELT rate-limits aggressively (429s are logged, the run continues).
 * Reddit, Quora, Google Play reviews and most review sites forbid crawling — they are identified as customer venues but not
-  scraped (Reddit can be enabled with free official API credentials).
-* Local LLM quality (qwen2.5:3b on CPU — the demo laptop had ~4.6 GB free RAM, too little for 7B) is below frontier models; the evidence/interpretation separation and signal-ID
-  citation checks are what keep the brief trustworthy. A free Groq/Gemini key can be dropped into `.env` for better prose.
+  scraped (Reddit can be enabled with free official API credentials). Apple's public customer-review RSS, used for app
+  reviews, now returns no review entries for any app (checked for Licious and Facebook on 27 Nov 2026); such sources are
+  probed, return 0 records and are rejected with that reason rather than faked.
+* Free-tier LLM: Groq limits are per model per day; the model chain (gpt-oss-120b → qwen3.8-27b → gpt-oss-20b → local
+  Ollama → rule-based) keeps runs going, and the model used is printed on every brief.
+* Hosted demo (Vercel Hobby): serverless instances keep their own `/tmp` copy of the database and stop after 300 s, so the
+  live site is a demonstration copy; the always-on deployment is the Docker/Render one with the in-process scheduler.
 * Founder interview answers in the demo were written by the candidate from public information (MeetUniversity's founder
-  was not interviewed); they are labelled as such.
+  was not interviewed); they are labelled as such. Internal data for MeetUniversity is a synthetic test file and every
+  statement derived from it is tagged in the brief.

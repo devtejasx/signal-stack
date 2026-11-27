@@ -11,12 +11,26 @@ of robots.txt or bot protection.
 
 | | |
 |---|---|
+| **Live app** | **https://signal-stack-kohl.vercel.app** — pre-loaded with the three demo companies (see *Hosting* below) |
 | Sample reports | [`reports/`](reports/) — MeetUniversity, Zerodha, Licious (brief, interview, profile, Signal Stack, audit) |
 | Minimum-target checklist | [`reports/MINIMUM_TARGETS.md`](reports/MINIMUM_TARGETS.md) (computed from the live database) |
 | Technical documentation | [`docs/TECHNICAL.md`](docs/TECHNICAL.md) |
 | Cost statement | [`docs/COST_STATEMENT.md`](docs/COST_STATEMENT.md) |
 | Test evidence | [`evidence/`](evidence/) (screenshots) and `tests/` |
 | Demo video script | [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) |
+
+## Demo results (from the database, see `reports/MINIMUM_TARGETS.md`)
+
+| | MeetUniversity | Zerodha (fintech) | Licious (D2C food) |
+|---|---|---|---|
+| Interview | 10 questions + 4 follow-ups | 10 + 4 | 10 + 4 |
+| Verified competitors | 10 | 9 | 8 |
+| Approved sources (Customers / Competitors / Market / Internal) | 37 (4 / 18 / 14 / 1) | 36 (5 / 25 / 5 / 1) | 28 (5 / 18 / 4 / 1) |
+| Collected records (all with source links) | 173 | 161 | 225 |
+| Crawl runs · briefs · audits | 5 · 2 · 1 | 2 · 1 · 1 | 3 · 2 · 1 |
+
+Licious also demonstrates a **business-context change** (expansion into the UAE): the stack was reassessed, 8 sources retired,
+23 added, and the revision report explains what changed (`reports/licious/context_change_revision.md`).
 
 ## What it does
 
@@ -64,7 +78,17 @@ uvicorn signalstack.web:app --port 8000
 # open http://localhost:8000  → enter "MeetUniversity" + https://www.meetuniversity.com
 ```
 
-### Deploy (free)
+### Hosting
+
+The live demo runs on **Vercel (free Hobby plan)** straight from this repository (`index.py`, `vercel.json`); every push to `main`
+redeploys. Serverless specifics, all disclosed: the read-only filesystem means the demo database (`deploy/seed.db`) is copied
+to `/tmp` on a cold start, so changes made on the live site are temporary and each serverless instance keeps its own copy;
+jobs run inside the request with Vercel's 300 s limit (research and the interview fit; a full discovery/crawl of a brand-new
+company can exceed it and is then logged as failed on *Runs & Failures*); the weekly brief and monthly audit are triggered by
+**Vercel Cron** (`/api/cron/*`, authenticated with `CRON_SECRET`). For an always-on instance with the in-process scheduler, use
+Docker or Render below. Add `GROQ_API_KEY` in the Vercel project settings for AI analysis on the hosted copy.
+
+### Deploy elsewhere (free)
 
 `render.yaml` is a Render Blueprint: on render.com choose **New → Blueprint**, pick this repository, paste `GROQ_API_KEY` when
 asked and deploy (free plan). The first boot seeds the demo database (`deploy/seed.db`). Free-tier limits: the instance sleeps
@@ -111,4 +135,12 @@ reports/            generated sample reports              docs/        technical
   companies' founders were not interviewed. They are labelled in the interview transcripts.
 * The MeetUniversity internal-intelligence section is driven by a **synthetic** CRM file
   (`demo/SYNTHETIC_crm_export_meetuniversity.csv`) to demonstrate the pipeline; it is flagged as synthetic in the brief.
-* All external developments in the briefs come from real, linked sources collected by the crawler.
+* All external developments in the briefs come from real, linked sources collected by the crawler. Every brief statement
+  that relies on the synthetic CRM file carries a ⚠️ *synthetic test data* tag, and synthetic records are titled
+  `[SYNTHETIC TEST DATA]` everywhere in the app.
+* Founder review steps in the demo were performed through the dashboard's own endpoints, exactly as a founder would:
+  MeetUniversity — official websites supplied for four founder-named competitors whose domain the automatic lookup got wrong
+  (`founder_competitor_fixes` in `demo/companies.json`, each still verified live), and three weak-fit competitors rejected
+  (Studyportals, uni-assist, AbroBot.ai); Licious — five customer-problem sources proposed by the audit/context change approved.
+* Briefs were generated with open-weights models on the Groq free tier (`openai/gpt-oss-120b`, `qwen/qwen3.8-27b`); the model
+  used is printed in each brief's header.

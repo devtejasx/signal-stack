@@ -1,10 +1,13 @@
 # Demo video script (≈ 8 minutes)
 
-Record the screen with the app running at `http://localhost:8000` (OBS Studio or Windows Game Bar `Win+Alt+R`, both free).
+Record the screen (OBS Studio or Windows Game Bar `Win+Alt+R`, both free). Use the live site
+**https://signal-stack-kohl.vercel.app** for the walkthrough of the three finished companies, and a local run
+(`uvicorn signalstack.web:app --port 8000` with `GROQ_API_KEY` in `.env`) for the live "add a company" part, because a full
+discovery + crawl takes longer than Vercel's free 300 s request limit.
 
 | Time | Show | Say |
 |---|---|---|
-| 0:00 | Home page | "Signal Stack turns a company into a continuously monitored business: research → interview → Signal Stack → monitoring → Monday brief. Everything is free/open-source; the LLM runs locally with Ollama." |
+| 0:00 | Home page | "Signal Stack turns a company into a continuously monitored business: research → interview → Signal Stack → monitoring → Monday brief. Everything is free/open-source; the AI runs on open-weights models on Groq's free tier." |
 | 0:30 | Add **MeetUniversity** + `https://www.meetuniversity.com`; Overview shows research running | "Research reads the site (robots.txt respected), sitemap, Wikipedia, news and App Store presence." |
 | 1:15 | **Intelligence Profile** → facts vs assumptions | "Facts are only facts if they match text on a fetched page — each has its source link. Inferences are assumptions until the founder confirms." |
 | 2:00 | **AI Interview** → answer 2 questions live, show a follow-up appear, skip one | "Questions come from this company's research. It asks one at a time, remembers answers, asks follow-ups, adapts the next question, and I can skip confidential ones and edit later." |

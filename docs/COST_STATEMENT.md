@@ -21,7 +21,8 @@
 | Wikipedia Action API | Company background | Free | Only notable companies have articles |
 | GOV.UK search Atom, US Federal Register RSS, publisher RSS feeds | Primary-source regulatory/industry news | Free | Coverage depends on the geography/publisher |
 | Reddit API (optional) | Customer communities | Free official API credentials | Not crawled without credentials (Reddit's robots.txt forbids crawling) |
-| Render free web service (deployment) | Hosts the dashboard + scheduler | Free plan, no card | Sleeps after ~15 min idle (first request ~1 min); ephemeral disk, so the demo DB is re-seeded on each deploy |
+| **Vercel Hobby** (live demo) | Serverless hosting + Vercel Cron for the weekly/monthly jobs | Free | 300 s per request, read-only FS (DB copied to /tmp, not persistent), Hobby cron at most daily (weekly/monthly used) |
+| Render free web service (alternative deployment) | Hosts the dashboard + scheduler | Free plan, no card | Sleeps after ~15 min idle (first request ~1 min); ephemeral disk, so the demo DB is re-seeded on each deploy |
 | GitHub Actions (external cron) | Wakes the free host Monday / 1st of month and calls `/api/cron/*` | Free for this volume | Scheduled workflows can start a few minutes late |
 | SMTP (optional) | Brief delivery | Any free mailbox | Without SMTP the brief is written as an `.eml` to `data/outbox/` |
 
